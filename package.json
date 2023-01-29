@@ -1,0 +1,19 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": { 
+    "fs-extra": "^11.1.0",
+    "image-downloader": "^4.3.0",
+    "puppeteer": "^19.5.2", 
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-stealth": "^2.11.1" 
+  }
+}
