@@ -16,18 +16,17 @@ const selectors = {
 };
 
 const delay = async (page, selector) => {
-  let attempt = 0; 
+  let attempt = 0;
   let isLoaded = false;
-  do { 
+  do {
     await page.waitForTimeout(2000);
-    if ((await page.$(selector)) != null) { 
+    if ((await page.$(selector)) != null) {
       isLoaded = true;
       return;
     }
     attempt++;
-  } while (attempt < 10 && !isLoaded); 
+  } while (attempt < 10 && !isLoaded);
 };
-
 
 const popups = async (page) => {
   // Conditional - close feedback alert
@@ -41,30 +40,31 @@ const popups = async (page) => {
     const btn = await page.$(selectors.button_close);
     btn.click();
     await page.waitForTimeout(2000);
-  } 
-}
+  }
+};
 
-module.exports = getProducts = async (page, data) => {
+module.exports = getListings = async (page, data) => {
   try {
     const pages_from = parseInt(data.pages_from);
     const pages_to = parseInt(data.pages_to);
-    let itemUrls = [];
+   
 
     for (let i = pages_from; i <= pages_to; i++) {
+      
       console.log(`Current page: ${i}, Remaining pages: ${pages_to - i}`);
       await page.goto(`${data.website}/pg-${i}`, {
         waitUntil: 'domcontentloaded',
       });
 
+      let itemUrls = [];
       // Extra delay
       await delay(page, selectors.items);
       await popups(page);
-    
 
       // Get item URLs
       if ((await page.$(selectors.items)) != null) {
         const lis = await page.$$(selectors.items);
-        for (let j = 0; j < lis.length; j++) {
+        for (let j = 0; j < lis.length; j++) { 
           if ((await lis[j].$(selectors.item_url)) != null) {
             const address = await lis[j].$eval(selectors.item_url, (el) =>
               el.getAttribute('href')
@@ -98,17 +98,16 @@ module.exports = getProducts = async (page, data) => {
             waitUntil: 'domcontentloaded',
           });
 
-          // Extra delay 
+          // Extra delay
           await delay(page, selectors.item_gallery);
-          await popups(page); 
-        
+          await popups(page);
 
           // Access image gallery
           if ((await page.$(selectors.item_gallery)) != null) {
             const btn = await page.$(selectors.item_gallery);
             btn.click();
             await page.waitForTimeout(2000);
-            await popups(page); 
+            await popups(page);
 
             // Extra delay
             if ((await page.$(selectors.image_list)) == null) {
@@ -118,7 +117,7 @@ module.exports = getProducts = async (page, data) => {
             // Get image URLs
             if ((await page.$(selectors.image_list)) != null) {
               const divs = await page.$$(selectors.image_list);
-              for (let b = 0; b < divs.length; b=b+2) {
+              for (let b = 0; b < divs.length; b = b + 2) {
                 let toElement = `div[data-testid="vertical-gallery"] > div:nth-child(${b})`;
                 if ((await page.$(toElement)) != null) {
                   // Scroll down and make delay
@@ -140,7 +139,7 @@ module.exports = getProducts = async (page, data) => {
                 });
               });
               await page.waitForTimeout(2000);
-              await popups(page); 
+              await popups(page);
               const imgDivs = await page.$$(selectors.image_list);
               for (let b = 0; b < imgDivs.length; b++) {
                 // Get image url
@@ -162,6 +161,8 @@ module.exports = getProducts = async (page, data) => {
         }
       }
     }
+    console.log("--------------------------------------------------")
+    console.log("Successfully finished!")
   } catch (e) {
     console.log(e);
   }
